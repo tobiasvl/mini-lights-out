@@ -1,13 +1,3 @@
-: check
-	0
-	0
-	0
-	0b00010000
-	0
-	0
-	0
-	0
-
 : light-off
   0b11111111
 	0b10000001
@@ -27,12 +17,6 @@
 	255
 	255
 	255
-
-: grid
-	1 1 1 1
-	1 1 1 1
-	1 1 1 1
-	1 1 1 1
 
 : launch
 	i := light
@@ -58,90 +42,150 @@
 	jump f
 
 :macro turn-on X Y {
-	va := X
-	vb := Y
+	:calc X2 { ( X * 8 ) + 16 }
+	:calc Y2 { Y * 8 }
+	va := X2
+	vb := Y2
 	sprite va vb 8
 }
 
 : one
 	turn-on 0 0
-	turn-on 8 0
-	turn-on 0 8
+	turn-on 1 0
+	turn-on 0 1
 	return
 	
 : two
 	turn-on 0 0
-	turn-on 8 0
-	turn-on 16 0
-	turn-on 8 8
+	turn-on 1 0
+	turn-on 2 0
+	turn-on 1 1
 	return
 
 : three
-	turn-on 8 0
-	turn-on 16 0
-	turn-on 24 0
-	turn-on 16 8
+	turn-on 1 0
+	turn-on 2 0
+	turn-on 3 0
+	turn-on 2 1
 	return
 
 : c
-	turn-on 16 0
-	turn-on 24 0
-	turn-on 24 8
+	turn-on 2 0
+	turn-on 3 0
+	turn-on 3 1
 	return
 
 : four
+	turn-on 0 1
+	turn-on 0 0
+	turn-on 0 2
+	turn-on 1 1
+	return
 
 : five
+	turn-on 1 0
+	turn-on 0 1
+	turn-on 1 1
+	turn-on 2 1
+	turn-on 1 2
+	return
 
 : six
+	turn-on 2 0
+	turn-on 1 1
+	turn-on 2 1
+	turn-on 3 1
+	turn-on 2 2
+	return
 
 : d
+	turn-on 3 0
+	turn-on 3 1
+	turn-on 3 2
+	turn-on 2 1
+	return
 
 : seven
+	turn-on 0 2
+	turn-on 0 1
+	turn-on 0 3
+	turn-on 1 2
+	return
 
 : eight
+	turn-on 1 1
+	turn-on 0 2
+	turn-on 1 2
+	turn-on 2 2
+	turn-on 1 3
+	return
 
 : nine
+	turn-on 2 1
+	turn-on 1 2
+	turn-on 2 2
+	turn-on 3 2
+	turn-on 2 3
+	return
 
 : e
+	turn-on 3 1
+	turn-on 3 2
+	turn-on 3 3
+	turn-on 2 2
+	return
 
 : a
+	turn-on 0 2
+	turn-on 0 3
+	turn-on 1 3
+	return
 
 : zero
-	turn-on 8 24
-	turn-on 16 24
-	turn-on 8 16
+	turn-on 0 3
+	turn-on 1 3
+	turn-on 2 3
+	turn-on 1 2
 	return
 
 : b
+	turn-on 1 3
+	turn-on 2 3
+	turn-on 3 3
+	turn-on 2 2
+	return
 
 : f
-
+	turn-on 3 3
+	turn-on 2 3
+	turn-on 3 2
 	return
 
 : check-win
-	i := check
+	i := light-off
 	va := 8
 	vb := 8
+	ve := 0
 	loop
 		vb += 8
 		while vb != 48
 		loop
 			va += 8
 			while va != 48
-			sprite va vb 8
-			if vf == 1 then jump win
-			sprite va vb 8
+			sprite va vb 1
+			if vf == 1 then ve := 1
+			sprite va vb 1
 		again
 		va := 8
 	again
+	if ve == 0 then win
 	return
 
 : win
-	clear
+	#clear
+	return
 
 : main
-
 	i := light-off
 	va := 8
 	vb := 8
