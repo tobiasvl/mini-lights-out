@@ -1,22 +1,162 @@
-: light-off
-  0b11111111
+:alias steps vd
+
+: keys
+	0
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
+	11
+	12
+	13
+	14
+
+: logo
+	0b10000100
+	0b10000100
+	0b10000100
+	0b10000100
+	0b10000100
+	0b10000100
+	0b11110100
+	
+	0b01110001
+	0b11001001
 	0b10000001
-	0b10000001
-	0b10000001
-	0b10000001
-	0b10000001
-	0b10000001
-  0b11111111
+	0b10011001
+	0b10001001
+	0b11001001
+	0b01110001
+	
+	0b00010111
+	0b00010001
+	0b00010001
+	0b11110001
+	0b00010001
+	0b00010001
+	0b00010001
+	
+	0b11001110
+	0b00010001
+	0b00010000
+	0b00001110
+	0b00000001
+	0b00010001
+	0b00001110
+	
+	0b01110001
+	0b11011001
+	0b10001001
+	0b10001001
+	0b10001001
+	0b11011001
+	0b01110000
+	
+	0b00010111
+	0b00010001
+	0b00010001
+	0b00010001
+	0b00010001
+	0b00010001
+	0b11100001
+	
+	0b11000000
+	0b00000000
+	0b00000000
+	0b00000000
+	0b00000000
+	0b00000000
+	0b00000000
+	
+: congrats-text
+	0b10000010
+	0b01000101
+	0b00101001
+	0b00010001
+	0b00010001
+	0b00010001
+	0b00010000
+	
+	0b11110001
+	0b10011001
+	0b00001001
+	0b00001001
+	0b00001001
+	0b10011001
+	0b11110000
+	
+	0b00001000
+	0b00001000
+	0b00001000
+	0b00001000
+	0b00001000
+	0b00001000
+	0b11110000
+	
+	0b01000100
+	0b01000100
+	0b00101010
+	0b00101010
+	0b00101010
+	0b00010001
+	0b00010001
+	
+	0b01010010
+	0b01010011
+	0b10010010
+	0b10010010
+	0b10010010
+	0b00010010
+	0b00010010
+	
+	0b00010000
+	0b00010000
+	0b10010000
+	0b10010000
+	0b01010000
+	0b00110000
+	0b00010000
+
+: steps-bcd
+	0
+	0
+	0
+
+: light-on
+	0b00000000
+	0b01111110
+	0b01111110
+	0b01111110
+	0b01111110
+	0b01111110
+	0b01111110
+	0b00000000
 
 : light
-	255
-	255
-	255
-	255
-	255
-	255
-	255
-	255
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+	0b11111111
+
+: test
+	0b00000001
 
 : launch
 	i := light
@@ -41,7 +181,7 @@
 	jump e
 	jump f
 
-:macro turn-on X Y {
+:macro toggle X Y {
 	:calc X2 { ( X * 8 ) + 16 }
 	:calc Y2 { Y * 8 }
 	va := X2
@@ -50,122 +190,121 @@
 }
 
 : one
-	turn-on 0 0
-	turn-on 1 0
-	turn-on 0 1
+	toggle 0 0
+	toggle 1 0
+	toggle 0 1
 	return
 	
 : two
-	turn-on 0 0
-	turn-on 1 0
-	turn-on 2 0
-	turn-on 1 1
+	toggle 0 0
+	toggle 1 0
+	toggle 2 0
+	toggle 1 1
 	return
 
 : three
-	turn-on 1 0
-	turn-on 2 0
-	turn-on 3 0
-	turn-on 2 1
+	toggle 1 0
+	toggle 2 0
+	toggle 3 0
+	toggle 2 1
 	return
 
 : c
-	turn-on 2 0
-	turn-on 3 0
-	turn-on 3 1
+	toggle 2 0
+	toggle 3 0
+	toggle 3 1
 	return
 
 : four
-	turn-on 0 1
-	turn-on 0 0
-	turn-on 0 2
-	turn-on 1 1
+	toggle 0 1
+	toggle 0 0
+	toggle 0 2
+	toggle 1 1
 	return
 
 : five
-	turn-on 1 0
-	turn-on 0 1
-	turn-on 1 1
-	turn-on 2 1
-	turn-on 1 2
+	toggle 1 0
+	toggle 0 1
+	toggle 1 1
+	toggle 2 1
+	toggle 1 2
 	return
 
 : six
-	turn-on 2 0
-	turn-on 1 1
-	turn-on 2 1
-	turn-on 3 1
-	turn-on 2 2
+	toggle 2 0
+	toggle 1 1
+	toggle 2 1
+	toggle 3 1
+	toggle 2 2
 	return
 
 : d
-	turn-on 3 0
-	turn-on 3 1
-	turn-on 3 2
-	turn-on 2 1
+	toggle 3 0
+	toggle 3 1
+	toggle 3 2
+	toggle 2 1
 	return
 
 : seven
-	turn-on 0 2
-	turn-on 0 1
-	turn-on 0 3
-	turn-on 1 2
+	toggle 0 2
+	toggle 0 1
+	toggle 0 3
+	toggle 1 2
 	return
 
 : eight
-	turn-on 1 1
-	turn-on 0 2
-	turn-on 1 2
-	turn-on 2 2
-	turn-on 1 3
+	toggle 1 1
+	toggle 0 2
+	toggle 1 2
+	toggle 2 2
+	toggle 1 3
 	return
 
 : nine
-	turn-on 2 1
-	turn-on 1 2
-	turn-on 2 2
-	turn-on 3 2
-	turn-on 2 3
+	toggle 2 1
+	toggle 1 2
+	toggle 2 2
+	toggle 3 2
+	toggle 2 3
 	return
 
 : e
-	turn-on 3 1
-	turn-on 3 2
-	turn-on 3 3
-	turn-on 2 2
+	toggle 3 1
+	toggle 3 2
+	toggle 3 3
+	toggle 2 2
 	return
 
 : a
-	turn-on 0 2
-	turn-on 0 3
-	turn-on 1 3
+	toggle 0 2
+	toggle 0 3
+	toggle 1 3
 	return
 
 : zero
-	turn-on 0 3
-	turn-on 1 3
-	turn-on 2 3
-	turn-on 1 2
+	toggle 0 3
+	toggle 1 3
+	toggle 2 3
+	toggle 1 2
 	return
 
 : b
-	turn-on 1 3
-	turn-on 2 3
-	turn-on 3 3
-	turn-on 2 2
+	toggle 1 3
+	toggle 2 3
+	toggle 3 3
+	toggle 2 2
 	return
 
 : f
-	turn-on 3 3
-	turn-on 2 3
-	turn-on 3 2
+	toggle 3 3
+	toggle 2 3
+	toggle 3 2
 	return
 
 : check-win
-	i := light-off
+	i := test
 	va := 8
 	vb := 8
-	ve := 0
 	loop
 		vb += 8
 		while vb != 48
@@ -173,20 +312,139 @@
 			va += 8
 			while va != 48
 			sprite va vb 1
-			if vf == 1 then ve := 1
+			ve := vf
 			sprite va vb 1
+			if ve == 0 then return
 		again
 		va := 8
 	again
-	if ve == 0 then win
-	return
+	jump win
 
 : win
-	#clear
+	clear
+	draw-steps
+	if steps != 4 then jump main
+	
+: congrats
+	i := congrats-text
+	va := 20
+	vb := 8
+	vc := 7
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	
+	va := 12
+	vb += 8
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	jump title-screen
+
+: draw-steps
+	i := steps-bcd
+	bcd steps
+	load v2
+	va := 52
+	vb := 14
+	i := hex v1
+	sprite va vb 5
+	va += 5
+	i := hex v2
+	sprite va vb 5
 	return
 
 : main
-	i := light-off
+	v0 := 50
+	buzzer := v0
+	i := logo
+	va := 17
+	vb := 8
+	vc := 7
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	
+	va := 17
+	vb += 8
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+
+: title-screen
+	v0 := 50
+	delay := v0	
+	if vf == 1 then buzzer := v0
+	i := keys
+	load ve
+
+: blink
+	if v0 key then jump game
+	if v1 key then jump game
+	if v2 key then jump game
+	if v3 key then jump game
+	if v4 key then jump game
+	if v5 key then jump game
+	if v6 key then jump game
+	if v7 key then jump game
+	if v8 key then jump game
+	if v9 key then jump game
+	if va key then jump game
+	if vb key then jump game
+	if vc key then jump game
+	if vd key then jump game
+	if ve key then jump game
+	vf := 0x0f
+	if vf key then jump game
+
+	vf := delay
+	if vf != 0 then jump blink
+	
+	i := light
+	va := -8
+	vb := -15
+	loop
+		vb += 15
+		while vb != 45
+		loop
+		va += 8
+			while va != 64
+			if vb == 30 then sprite va vb 2
+			if vb != 30 then sprite va vb 15
+		again
+		va := -8
+	again
+	
+	jump title-screen
+
+: game
+	clear
+	steps := 0
+	buzzer := steps
+	i := light-on
 	va := 8
 	vb := 8
 	loop
@@ -199,9 +457,15 @@
 		again
 		va := 8
 	again
+	
+	draw-steps
 
   loop
-		v0 := key
+		v3 := key
+		draw-steps
+		steps += 1
+		draw-steps
+		v0 := v3
 		launch
 		check-win
 	again
