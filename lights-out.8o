@@ -1,0 +1,163 @@
+: check
+	0
+	0
+	0
+	0b00010000
+	0
+	0
+	0
+	0
+
+: light-off
+  0b11111111
+	0b10000001
+	0b10000001
+	0b10000001
+	0b10000001
+	0b10000001
+	0b10000001
+  0b11111111
+
+: light
+	255
+	255
+	255
+	255
+	255
+	255
+	255
+	255
+
+: grid
+	1 1 1 1
+	1 1 1 1
+	1 1 1 1
+	1 1 1 1
+
+: launch
+	i := light
+	v0 <<= v0
+	jump0 flip
+
+: flip
+	jump zero
+	jump one
+	jump two
+	jump three
+	jump four
+	jump five
+	jump six
+	jump seven
+	jump eight
+	jump nine
+	jump a
+	jump b
+	jump c
+	jump d
+	jump e
+	jump f
+
+:macro turn-on X Y {
+	va := X
+	vb := Y
+	sprite va vb 8
+}
+
+: one
+	turn-on 0 0
+	turn-on 8 0
+	turn-on 0 8
+	return
+	
+: two
+	turn-on 0 0
+	turn-on 8 0
+	turn-on 16 0
+	turn-on 8 8
+	return
+
+: three
+	turn-on 8 0
+	turn-on 16 0
+	turn-on 24 0
+	turn-on 16 8
+	return
+
+: c
+	turn-on 16 0
+	turn-on 24 0
+	turn-on 24 8
+	return
+
+: four
+
+: five
+
+: six
+
+: d
+
+: seven
+
+: eight
+
+: nine
+
+: e
+
+: a
+
+: zero
+	turn-on 8 24
+	turn-on 16 24
+	turn-on 8 16
+	return
+
+: b
+
+: f
+
+	return
+
+: check-win
+	i := check
+	va := 8
+	vb := 8
+	loop
+		vb += 8
+		while vb != 48
+		loop
+			va += 8
+			while va != 48
+			sprite va vb 8
+			if vf == 1 then jump win
+			sprite va vb 8
+		again
+		va := 8
+	again
+	return
+
+: win
+	clear
+
+: main
+
+	i := light-off
+	va := 8
+	vb := 8
+	loop
+		vb += 8
+		while vb != 48
+		loop
+			va += 8
+			while va != 48
+			sprite va vb 8
+		again
+		va := 8
+	again
+
+  loop
+		v0 := key
+		launch
+		check-win
+	again
