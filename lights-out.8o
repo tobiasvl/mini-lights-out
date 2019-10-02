@@ -341,9 +341,9 @@
 	vc := random 255
 	ve := random 255
 	# if all lights are off already, we need a new configuration
-	vf := vc
-	vf &= ve
-	if vf == 0 then jump init-game
+	vb := vc
+	vb &= ve
+	if vb == 0 then jump init-game
 
 	# draw grid
 	va := 8
