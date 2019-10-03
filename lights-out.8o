@@ -121,6 +121,9 @@
   loop
 		# wait for input
 		v3 := key
+		# make sure the pressed light was lit
+		jump check-lit
+		: foo
 		# erase step counter
 		draw-steps
 		# increment step counter
@@ -137,6 +140,40 @@
 		# the win condition is met or not without filling the stack
 		jump check-win
 	again
+
+: check-lit
+	# map pressed key to light
+	v0 := v3
+	i := keys
+	i += v0
+	load v0
+	
+	va := v0
+	vb := v0
+
+	# X position of pressed light
+	vc := 0b00011
+	va &= vc
+	va <<= va
+	va <<= va
+	va <<= va
+	va += 16
+
+	# Y position of pressed light
+	vc := 0b11100
+	vb &= vc
+	vb <<= vb
+	
+	i := test
+	sprite va vb 1
+	ve := vf
+	sprite va vb 1
+	
+	if ve == 0 then jump foo
+	
+	v0 := 10
+	buzzer := v0
+	jump game-loop
 	
 : toggle
 	# map pressed key to light
