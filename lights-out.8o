@@ -1,5 +1,258 @@
 :alias steps vd
 
+: main
+	# set up title screen
+	v0 := 50
+	buzzer := v0
+	i := logo
+	va := 17
+	vb := 8
+	vc := 7
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	
+	va := 17
+	vb += 8
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+
+: title-screen
+	v0 := 50
+	delay := v0	
+	if vf == 1 then buzzer := v0
+	i := keys
+	load ve
+
+: blink
+	if v0 key then jump init-game
+	if v1 key then jump init-game
+	if v2 key then jump init-game
+	if v3 key then jump init-game
+	if v4 key then jump init-game
+	if v5 key then jump init-game
+	if v6 key then jump init-game
+	if v7 key then jump init-game
+	if v8 key then jump init-game
+	if v9 key then jump init-game
+	if va key then jump init-game
+	if vb key then jump init-game
+	if vc key then jump init-game
+	if vd key then jump init-game
+	if ve key then jump init-game
+	vf := 0x0f
+	if vf key then jump init-game
+
+	vf := delay
+	if vf != 0 then jump blink
+	
+	# invert title screen
+	i := light
+	va := -8
+	vb := -15
+	loop
+		vb += 15
+		while vb != 45
+		loop
+		va += 8
+			while va != 64
+			if vb == 30 then sprite va vb 2
+			if vb != 30 then sprite va vb 15
+		again
+		va := -8
+	again
+	
+	jump title-screen
+
+: init-game
+	# initialize a game
+	steps := 0
+	buzzer := steps
+	i := light-on
+	
+	# randomize grid
+	vc := random 255
+	ve := random 255
+	# if all lights are off already, we need a new configuration
+	vb := vc
+	vb &= ve
+	if vb == 0 then jump init-game
+
+	# draw grid
+	clear
+	va := 8
+	vb := -8
+	loop
+		if vb == 0 then vc := ve
+		if vb == 16 then vc := ve
+		vb += 8
+		while vb != 32
+		loop
+			va += 8
+			while va != 48
+			sprite va vb 8
+			vc >>= vc
+			if vf == 1 begin
+				i := light
+				sprite va vb 8
+				i := light-on
+			end
+		again
+		va := 8
+	again
+	
+	draw-steps
+
+: game-loop
+  loop
+		# wait for input
+		v3 := key
+		# erase step counter
+		draw-steps
+		# increment step counter
+		steps += 1
+		# if we overflow the BCD step counter, the game is lost and we just
+		# reset the game
+		if steps == 100 then jump main
+		# draw step counter
+		draw-steps
+		# toggle selected lights
+		toggle
+		# check if all lights are off
+		# we jump here so we can branch there depending on whether
+		# the win condition is met or not without filling the stack
+		jump check-win
+	again
+	
+: toggle
+	# map pressed key to light
+	v0 := v3
+	i := keys
+	i += v0
+	load v0
+	
+	va := v0
+	vb := v0
+
+	# X position of pressed light
+	vc := 0b00011
+	va &= vc
+	va <<= va
+	va <<= va
+	va <<= va
+	va += 16
+
+	# Y position of pressed light
+	vc := 0b11100
+	vb &= vc
+	vb <<= vb
+	
+	i := light
+	
+	# toggle pressed light
+	sprite va vb 8
+	
+	# toggle light to the left
+	v3 := va
+	va += -8
+	if va == 8 then va += -32
+	sprite va vb 8
+	
+	# toggle light to the right
+	va := v3
+	va += 8
+	if va == 48 then va += -32
+	sprite va vb 8
+	va := v3
+	
+	# toggle light above
+	vb += -8
+	sprite va vb 8
+	
+	# toggle light below
+	vb += 16
+	sprite va vb 8
+	
+	return
+
+: check-win
+	# draw a single pixel in the upper right corner of the border of every light
+	# if it fails to collide anywhere, it's found a lit light and returns
+	i := test
+	va := 8
+	vb := 8
+	loop
+		vb += 8
+		while vb != 48
+		loop
+			va += 8
+			while va != 48
+			sprite va vb 1
+			ve := vf
+			sprite va vb 1
+			# if we didn't collide, this light is on
+			if ve == 0 then jump game-loop
+		again
+		va := 8
+	again
+
+: win
+	clear
+	draw-steps
+	
+: congrats
+	i := congrats-text
+	va := 20
+	vb := 8
+	vc := 7
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	
+	va := 12
+	vb += 8
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	i += vc
+	va += 8
+	sprite va vb 7
+	jump title-screen
+
+: draw-steps
+	i := steps-bcd
+	bcd steps
+	load v2
+	va := 52
+	vb := 14
+	i := hex v1
+	sprite va vb 5
+	va += 5
+	i := hex v2
+	sprite va vb 5
+	return
+
 : keys
 	# maps a key to its grid position
 	13 0 1 2 4 5 6 8 9 10 12 14 3 7 11 15
@@ -115,9 +368,7 @@
 	0b00010000
 
 : steps-bcd
-	0
-	0
-	0
+	0	0	0
 
 : light-on
 	0b00000000
@@ -145,242 +396,3 @@
 	0b11111111
 	0b11111111
 	0b11111111
-
-#: test
-#	0b00000001
-
-: toggle
-	v0 := v3
-	i := keys
-	i += v0
-	load v0
-	
-	va := v0
-	vb := v0
-
-	vc := 0b11100
-	vb &= vc
-	vb <<= vb
-
-	vc := 0b00011
-	va &= vc
-	va <<= va
-	va <<= va
-	va <<= va
-	va += 16
-	
-	i := light
-	sprite va vb 8
-	
-	v3 := va
-	va += -8
-	if va == 8 then va += -32
-	sprite va vb 8
-	
-	va := v3
-	va += 8
-	if va == 48 then va += -32
-	sprite va vb 8
-	va := v3
-	
-	vb += -8
-	sprite va vb 8
-	
-	vb += 16
-	sprite va vb 8
-	
-	return
-
-: check-win
-	i := test
-	va := 8
-	vb := 8
-	loop
-		vb += 8
-		while vb != 48
-		loop
-			va += 8
-			while va != 48
-			sprite va vb 1
-			ve := vf
-			sprite va vb 1
-			if ve == 0 then return
-		again
-		va := 8
-	again
-	# we're skipping a return here, filling up the stack
-	jump win
-
-: win
-	clear
-	draw-steps
-	
-: congrats
-	i := congrats-text
-	va := 20
-	vb := 8
-	vc := 7
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	
-	va := 12
-	vb += 8
-	i += vc
-	va += 8
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	jump title-screen
-
-: draw-steps
-	i := steps-bcd
-	bcd steps
-	load v2
-	va := 52
-	vb := 14
-	i := hex v1
-	sprite va vb 5
-	va += 5
-	i := hex v2
-	sprite va vb 5
-	return
-
-: main
-	v0 := 50
-	buzzer := v0
-	i := logo
-	va := 17
-	vb := 8
-	vc := 7
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	
-	va := 17
-	vb += 8
-	i += vc
-	va += 8
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-	i += vc
-	va += 8
-	sprite va vb 7
-
-: title-screen
-	v0 := 50
-	delay := v0	
-	if vf == 1 then buzzer := v0
-	i := keys
-	load ve
-
-: blink
-	if v0 key then jump init-game
-	if v1 key then jump init-game
-	if v2 key then jump init-game
-	if v3 key then jump init-game
-	if v4 key then jump init-game
-	if v5 key then jump init-game
-	if v6 key then jump init-game
-	if v7 key then jump init-game
-	if v8 key then jump init-game
-	if v9 key then jump init-game
-	if va key then jump init-game
-	if vb key then jump init-game
-	if vc key then jump init-game
-	if vd key then jump init-game
-	if ve key then jump init-game
-	vf := 0x0f
-	if vf key then jump init-game
-
-	vf := delay
-	if vf != 0 then jump blink
-	
-	i := light
-	va := -8
-	vb := -15
-	loop
-		vb += 15
-		while vb != 45
-		loop
-		va += 8
-			while va != 64
-			if vb == 30 then sprite va vb 2
-			if vb != 30 then sprite va vb 15
-		again
-		va := -8
-	again
-	
-	jump title-screen
-
-: init-game
-	# initialize a game
-	clear
-	steps := 0
-	buzzer := steps
-	i := light-on
-	
-	# randomize grid
-	vc := random 255
-	ve := random 255
-	# if all lights are off already, we need a new configuration
-	vb := vc
-	vb &= ve
-	if vb == 0 then jump init-game
-
-	# draw grid
-	va := 8
-	vb := -8
-	loop
-		if vb == 0 then vc := ve
-		if vb == 16 then vc := ve
-		vb += 8
-		while vb != 32
-		loop
-			va += 8
-			while va != 48
-			sprite va vb 8
-			vc >>= vc
-			if vf == 1 begin
-				i := light
-				sprite va vb 8
-				i := light-on
-			end
-		again
-		va := 8
-	again
-	
-	draw-steps
-
-	# game loop
-  loop
-		# wait for input
-		v3 := key
-		# erase step counter
-		draw-steps
-		# increment step counter
-		steps += 1
-		# draw step counter
-		draw-steps
-		# toggle selected lights
-		toggle
-		# check if all lights are off
-		check-win
-	again
