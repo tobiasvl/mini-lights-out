@@ -54,7 +54,7 @@
 	if vc key then jump init-game
 	if vd key then jump init-game
 	if ve key then jump init-game
-	vf := 0x0f
+	vf := 0x0f # otherwise vf is mangled by… something
 	if vf key then jump init-game
 
 	vf := delay
@@ -118,115 +118,22 @@
 	draw-steps
 
 : game-loop
-  loop
-		# wait for input
-		v3 := key
-		# make sure the pressed light was lit
-		jump check-lit
-		: foo
-		# erase step counter
-		draw-steps
-		# increment step counter
-		steps += 1
-		# if we overflow the BCD step counter, the game is lost and we just
-		# reset the game
-		if steps == 100 then jump main
-		# draw step counter
-		draw-steps
-		# toggle selected lights
-		toggle
-		# check if all lights are off
-		# we jump here so we can branch there depending on whether
-		# the win condition is met or not without filling the stack
-		jump check-win
-	again
-
-: check-lit
-	# map pressed key to light
-	v0 := v3
-	i := keys
-	i += v0
-	load v0
+	# wait for input
+	v3 := key
+	# try toggling the light
+	toggle
+	# erase step counter
+	draw-steps
+	# increment step counter
+	steps += 1
+	# if we overflow the BCD step counter, the game is lost and we just
+	# reset the game
+	if steps == 100 then jump main
+	# draw step counter
+	draw-steps
 	
-	va := v0
-	vb := v0
-
-	# X position of pressed light
-	vc := 0b00011
-	va &= vc
-	va <<= va
-	va <<= va
-	va <<= va
-	va += 16
-
-	# Y position of pressed light
-	vc := 0b11100
-	vb &= vc
-	vb <<= vb
-	
-	i := test
-	sprite va vb 1
-	ve := vf
-	sprite va vb 1
-	
-	if ve == 0 then jump foo
-	
-	v0 := 10
-	buzzer := v0
-	jump game-loop
-	
-: toggle
-	# map pressed key to light
-	v0 := v3
-	i := keys
-	i += v0
-	load v0
-	
-	va := v0
-	vb := v0
-
-	# X position of pressed light
-	vc := 0b00011
-	va &= vc
-	va <<= va
-	va <<= va
-	va <<= va
-	va += 16
-
-	# Y position of pressed light
-	vc := 0b11100
-	vb &= vc
-	vb <<= vb
-	
-	i := light
-	
-	# toggle pressed light
-	sprite va vb 8
-	
-	# toggle light to the left
-	v3 := va
-	va += -8
-	if va == 8 then va += -32
-	sprite va vb 8
-	
-	# toggle light to the right
-	va := v3
-	va += 8
-	if va == 48 then va += -32
-	sprite va vb 8
-	va := v3
-	
-	# toggle light above
-	vb += -8
-	sprite va vb 8
-	
-	# toggle light below
-	vb += 16
-	sprite va vb 8
-	
-	return
-
 : check-win
+	# check if all lights are off.
 	# draw a single pixel in the upper right corner of the border of every light
 	# if it fails to collide anywhere, it's found a lit light and returns
 	i := test
@@ -247,11 +154,10 @@
 		va := 8
 	again
 
-: win
+	# the game is won!
 	clear
 	draw-steps
 	
-: congrats
 	i := congrats-text
 	va := 20
 	vb := 8
@@ -288,6 +194,68 @@
 	va += 5
 	i := hex v2
 	sprite va vb 5
+	return
+
+: toggle
+	# map pressed key to light
+	v0 := v3
+	i := keys
+	i += v0
+	load v0
+	
+	va := v0
+	vb := v0
+
+	# X position of pressed light
+	vc := 0b00011
+	va &= vc
+	va <<= va
+	va <<= va
+	va <<= va
+	va += 16
+
+	# Y position of pressed light
+	vc := 0b11100
+	vb &= vc
+	vb <<= vb
+	
+	i := test
+	sprite va vb 1
+	ve := vf
+	sprite va vb 1
+	
+	if ve == 1 begin
+		v0 := 10
+		buzzer := v0
+		jump game-loop
+	end
+	
+	i := light
+	
+	# toggle pressed light
+	sprite va vb 8
+	
+	# toggle light to the left
+	v3 := va
+	va += -8
+	if va == 8 then va += -32
+	sprite va vb 8
+	
+	# toggle light to the right
+	va := v3
+	va += 8
+	if va == 48 then va += -32
+	sprite va vb 8
+	va := v3
+	
+	# toggle light above
+	vb += -8
+	sprite va vb 8
+	
+	# toggle light below
+	vb += 16
+	sprite va vb 8
+	
 	return
 
 : keys
