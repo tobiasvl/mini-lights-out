@@ -2,7 +2,9 @@
 
 : main
 	# set up title screen
+	clear
 	v0 := 50
+	# you probably want to remove the following line if you're running on something that beeps
 	buzzer := v0
 	i := logo
 	va := 17
@@ -29,54 +31,56 @@
 	sprite va vb 7
 	i += vc
 	va += 8
-	sprite va vb 7
+	sprite va vb 1
 
 : title-screen
-	v0 := 50
-	delay := v0	
-	if vf == 1 then buzzer := v0
-	i := keys
-	load ve
-
-: blink
-	if v0 key then jump init-game
-	if v1 key then jump init-game
-	if v2 key then jump init-game
-	if v3 key then jump init-game
-	if v4 key then jump init-game
-	if v5 key then jump init-game
-	if v6 key then jump init-game
-	if v7 key then jump init-game
-	if v8 key then jump init-game
-	if v9 key then jump init-game
-	if va key then jump init-game
-	if vb key then jump init-game
-	if vc key then jump init-game
-	if vd key then jump init-game
-	if ve key then jump init-game
-	vf := 0x0f # otherwise vf is mangled by… something
-	if vf key then jump init-game
-
-	vf := delay
-	if vf != 0 then jump blink
-	
-	# invert title screen
-	i := light
-	va := -8
-	vb := -15
 	loop
-		vb += 15
-		while vb != 45
+		v0 := 50
+		delay := v0	
+		# if the last blink inverted the title screen back, we buzz (ie. flash in Octo)
+		# you probably want to remove this if you're running on something that beeps
+		if vf == 1 then buzzer := v0
+		i := keys
+		load ve
+
 		loop
-		va += 8
-			while va != 64
-			if vb == 30 then sprite va vb 2
-			if vb != 30 then sprite va vb 15
+			if v0 key then jump init-game
+			if v1 key then jump init-game
+			if v2 key then jump init-game
+			if v3 key then jump init-game
+			if v4 key then jump init-game
+			if v5 key then jump init-game
+			if v6 key then jump init-game
+			if v7 key then jump init-game
+			if v8 key then jump init-game
+			if v9 key then jump init-game
+			if va key then jump init-game
+			if vb key then jump init-game
+			if vc key then jump init-game
+			if vd key then jump init-game
+			if ve key then jump init-game
+			vf := 0x0f # we use vf below
+			if vf key then jump init-game
+			vf := delay
+			if vf != 0 then
 		again
+
+		# invert title screen
+		i := light
 		va := -8
+		vb := -15
+		loop
+			vb += 15
+			while vb != 45
+			loop
+			va += 8
+				while va != 64
+				if vb == 30 then sprite va vb 2
+				if vb != 30 then sprite va vb 15
+			again
+			va := -8
+		again
 	again
-	
-	jump title-screen
 
 : init-game
 	# initialize a game
@@ -104,7 +108,7 @@
 		loop
 			va += 8
 			while va != 48
-			sprite va vb 8
+			sprite va vb 7
 			vc >>= vc
 			if vf == 1 begin
 				i := light
@@ -121,7 +125,8 @@
 	# wait for input
 	v3 := key
 	# try toggling the light
-	toggle
+	jump toggle
+	: toggled
 	# erase step counter
 	draw-steps
 	# increment step counter
@@ -146,10 +151,9 @@
 			va += 8
 			while va != 48
 			sprite va vb 1
-			ve := vf
 			sprite va vb 1
-			# if we didn't collide, this light is on
-			if ve == 0 then jump game-loop
+			# if we erased, this light is on
+			if vf == 1 then jump game-loop
 		again
 		va := 8
 	again
@@ -221,10 +225,9 @@
 	
 	i := test
 	sprite va vb 1
-	ve := vf
 	sprite va vb 1
 	
-	if ve == 1 begin
+	if vf == 0 begin
 		v0 := 10
 		buzzer := v0
 		jump game-loop
@@ -256,7 +259,7 @@
 	vb += 16
 	sprite va vb 8
 	
-	return
+	jump toggled
 
 : keys
 	# maps a key to its grid position
@@ -314,12 +317,6 @@
 	0b11100001
 	
 	0b11000000
-	0b00000000
-	0b00000000
-	0b00000000
-	0b00000000
-	0b00000000
-	0b00000000
 	
 : congrats-text
 	# YOU
@@ -372,9 +369,6 @@
 	0b00110000
 	0b00010000
 
-: steps-bcd
-	0	0	0
-
 : light-on
 	0b00000000
 	0b01111110
@@ -383,7 +377,6 @@
 	0b01111110
 	0b01111110
 	0b01111110
-	0b00000000
 
 : light
 	0b11111111
@@ -401,3 +394,5 @@
 	0b11111111
 	0b11111111
 	0b11111111
+
+: steps-bcd
